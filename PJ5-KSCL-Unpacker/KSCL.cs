@@ -119,6 +119,7 @@ namespace PJ5_KSCL_Unpacker
                 Console.WriteLine("RawSize: " + textures[i].RawSize.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
 
                 reader.BaseStream.Position += 0x28;
+                Console.WriteLine("init Data " +  " - " + reader.BaseStream.Position.ToString("X"));
                 textures[i].RawData = reader.ReadBytes(textures[i].RawSize);
                 reader.BaseStream.Position = temp;
             }
