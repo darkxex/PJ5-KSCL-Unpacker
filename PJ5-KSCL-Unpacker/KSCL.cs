@@ -35,15 +35,28 @@ namespace PJ5_KSCL_Unpacker
             if (ksclMagic != 0x4B53434C) throw new Exception("Unsupported file type.");
             reader.ReadInt32();
             header.KSCLLength = reader.ReadInt32() + 0x8C;
+            Console.WriteLine("KSCLLength: " + header.KSCLLength.ToString("X") +" - " + reader.BaseStream.Position.ToString("X"));
             reader.BaseStream.Position = header.KSCLLength;
             int ksltMagic = reader.ReadInt32();
+            Console.WriteLine("KSltMagic: " + ksltMagic.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             reader.ReadInt32();
             if (ksltMagic != 0x4B534C54) throw new Exception("Unsupported file type.");
             header.TexCount = reader.ReadInt32();
+            Console.WriteLine("TextCount: " + header.TexCount.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             header.HeaderlessSize = reader.ReadInt32();
+            Console.WriteLine("HeaderLessSize: " + header.HeaderlessSize.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             header.TablePointer = reader.ReadInt32();
+            Console.WriteLine("TablePointer: " + header.TablePointer.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             header.NameLength = reader.ReadInt32();
+            Console.WriteLine("NameLength: " + header.NameLength.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             header.NameCount = reader.ReadInt32();
+            Console.WriteLine("NameCount: " + header.NameCount.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
             return header;
         }
         private static string ReadString(ref BinaryReader reader)
@@ -72,6 +85,8 @@ namespace PJ5_KSCL_Unpacker
         private static KSLT_Texture[] GetTextures(ref BinaryReader reader, Header header)
         {
             reader.BaseStream.Position = header.TablePointer + header.KSCLLength + 0x40 + (0x14 * header.TexCount);
+            Console.WriteLine("Init Kslt texture " + " - " + reader.BaseStream.Position.ToString("X"));
+
             string[] names = new string[header.TexCount];
             for (int i = 0; i < names.Length; i++)
             {
@@ -82,14 +97,27 @@ namespace PJ5_KSCL_Unpacker
             for (int i = 0; i < textures.Length; i++)
             {
                 textures[i].Pointer = reader.ReadInt32();
+                Console.WriteLine("Texture Pointer: " + textures[i].Pointer.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
                 textures[i].Name = names[i];
+
                 long temp = reader.BaseStream.Position + 0x10;
                 reader.BaseStream.Position = textures[i].Pointer + header.KSCLLength;
+                Console.WriteLine("Init data " + " - " + reader.BaseStream.Position.ToString("X"));
+
                 textures[i].FormatType = reader.ReadInt32();
+                Console.WriteLine("Format: " + textures[i].FormatType.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
                 textures[i].Width = reader.ReadInt16();
+                Console.WriteLine("Width: " + textures[i].Width.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
                 textures[i].Height = reader.ReadInt16();
+                Console.WriteLine("Height: " + textures[i].Height.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
                 reader.BaseStream.Position += 0x14;
                 textures[i].RawSize = reader.ReadInt32();
+                Console.WriteLine("RawSize: " + textures[i].RawSize.ToString("X") + " - " + reader.BaseStream.Position.ToString("X"));
+
                 reader.BaseStream.Position += 0x28;
                 textures[i].RawData = reader.ReadBytes(textures[i].RawSize);
                 reader.BaseStream.Position = temp;
